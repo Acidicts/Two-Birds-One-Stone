@@ -1,10 +1,19 @@
 import pygame
-import Game.utils as utils
+from .utils import load_image
+
 
 class Bird:
     def __init__(self, x, y, distance, speed, direction, delay=1):
-        self.image = utils.load_image("bird_front.png")
-        self.image = pygame.transform.scale(self.image, (30, 45))
+        image = load_image("bird_side.png")
+
+        self.images = {
+            "front": pygame.transform.scale(load_image("bird_front.png"), (30, 45)),
+            "right": pygame.transform.scale(pygame.transform.flip(image, True, False), (33, 45)),
+            "left": pygame.transform.scale(load_image("bird_side.png"), (33, 45))
+        }
+
+        self.image = self.images["front"]
+        self.dead = False
 
         self.original_pos = x + 57, y
         self.x, self.y = x + 57, y
@@ -15,24 +24,30 @@ class Bird:
         self.speed = speed
         self.direction = direction
 
-        self.delay = None
+        self.delay = 0
         self.delay_time = delay
 
     def move(self):
-        self.x += self.direction * self.speed
-        if self.delay is None:
+        if self.delay == 0:
+
+            self.x += self.speed * self.direction
+            self.image = self.images["right"] if self.direction == 1 else self.images["left"]
+
             if self.x - self.original_pos[0] >= self.distance:
                 self.direction *= -1
+                self.delay = pygame.time.get_ticks()
+
             elif self.x - self.original_pos[0] <= 0:
                 self.direction *= -1
-            self.delay = pygame.time.get_ticks()
+                self.delay = pygame.time.get_ticks()
+
+        elif pygame.time.get_ticks() - self.delay >= self.delay_time * 1000:
+            self.delay = 0
         else:
-            if pygame.time.get_ticks() - self.delay >= self.delay_time * 1000:
-                self.delay = None
+            self.image = self.images["front"]
 
     def draw(self, screen):
         pygame.draw.line(screen, (0, 0, 0), (100, self.rect.bottom), (700, self.rect.bottom), 3)
-        if self.image:
+
+        if self.image and not self.dead:
             screen.blit(self.image, (self.x, self.y))
-        else:
-            pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, 50, 50))

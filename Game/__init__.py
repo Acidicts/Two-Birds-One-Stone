@@ -1,5 +1,7 @@
 import pygame
 from .bird import Bird
+from .background import draw_background
+from .slingshot import Slingshot
 
 
 class Game:
@@ -14,26 +16,46 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.running = True
+        self.level = 1
+        self.won = False
+
+        self.slingshot = Slingshot(self)
 
         self.birds = []
+        self.rocks = []
 
     def draw(self):
-        self.win.fill((255, 255, 255))
+
+        draw_background(self.win)
+
+        wait = self.slingshot.update()
+
+        if wait and self.won:
+            self.rocks = []
+            self.birds = []
+            self.won = False
+            self.slingshot.shot = False
 
         for flap in self.birds:
             flap.move()
             flap.draw(self.win)
 
-        pygame.draw.line(self.win,  (193, 154, 107), (92, 100), (92, 600), 15)
-        pygame.draw.line(self.win, (193, 154, 107), (707, 100), (707, 600), 15)
-        pygame.draw.line(self.win, (193, 154, 107), (92, 100), (50, 50), 15)
-        pygame.draw.line(self.win, (193, 154, 107), (707, 100), (750, 50), 15)
-        pygame.draw.line(self.win, (193, 154, 107), (50, 50), (750, 50), 15)
-        pygame.draw.circle(self.win, (193, 154, 107), (92, 100), 7.5, 15)
-        pygame.draw.circle(self.win, (193, 154, 107), (707, 100), 7.5, 15)
+        for rock in self.rocks:
+            rock.draw(self.win)
+
+    def collisions(self):
+        win = True
+        for flap in self.birds:
+            for rock in self.rocks:
+                if flap.rect.colliderect(rock.rect):
+                    flap.dead = True
+            win = not flap.dead
+        return win
+
+
 
     def run(self):
-        self.birds.append(Bird(100, 100, 100, 1, 1))
+        self.birds.append(Bird(200, 100, 100, 1, 1, 0.5))
 
         while self.running:
             for event in pygame.event.get():
@@ -41,6 +63,10 @@ class Game:
                     self.running = False
 
             self.draw()
+            self.won = self.collisions()
+
+            if self.won:
+                self.level += 1
 
             self.clock.tick(60)
             pygame.display.flip()
