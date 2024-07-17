@@ -2,6 +2,7 @@ import pygame
 from .bird import Bird
 from .background import draw_background
 from .slingshot import Slingshot
+from.level_loader import load_level
 
 
 class Game:
@@ -24,6 +25,8 @@ class Game:
         self.birds = []
         self.rocks = []
 
+        load_level(self.level, self)
+
     def draw(self):
 
         draw_background(self.win)
@@ -35,6 +38,7 @@ class Game:
             self.birds = []
             self.won = False
             self.slingshot.shot = False
+            load_level(self.level, self)
 
         for flap in self.birds:
             flap.move()
@@ -55,7 +59,7 @@ class Game:
 
 
     def run(self):
-        self.birds.append(Bird(200, 100, 100, 1, 1, 0.5))
+        self.won = False
 
         while self.running:
             for event in pygame.event.get():
@@ -67,6 +71,8 @@ class Game:
 
             if self.won:
                 self.level += 1
+                self.running = False
+                # load_level(self.level, self)
 
             self.clock.tick(60)
             pygame.display.flip()

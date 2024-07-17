@@ -1,0 +1,5 @@
+{
+"bird": {
+  "type": "bird", "x": 100, "y": 100, "distance": 100, "speed": 1
+}
+}
