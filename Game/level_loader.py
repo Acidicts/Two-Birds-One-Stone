@@ -1,5 +1,5 @@
 import json
-from . import Bird
+from .bird import Bird
 
 def load_level(level, game):
     game.birds = []

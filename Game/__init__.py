@@ -1,8 +1,9 @@
 import pygame
+import traceback
 from .bird import Bird
 from .background import draw_background
 from .slingshot import Slingshot
-from.level_loader import load_level
+from .level_loader import load_level
 
 
 class Game:
@@ -38,6 +39,7 @@ class Game:
             self.birds = []
             self.won = False
             self.slingshot.shot = False
+
             load_level(self.level, self)
 
         for flap in self.birds:
@@ -56,8 +58,6 @@ class Game:
             win = not flap.dead
         return win
 
-
-
     def run(self):
         self.won = False
 
@@ -67,12 +67,14 @@ class Game:
                     self.running = False
 
             self.draw()
-            self.won = self.collisions()
 
-            if self.won:
+            if self.collisions():
+                self.won = True
                 self.level += 1
                 self.running = False
-                # load_level(self.level, self)
+                load_level(self.level, self)
 
             self.clock.tick(60)
             pygame.display.flip()
+
+        traceback.print_exc()
