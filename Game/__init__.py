@@ -5,7 +5,6 @@ from .background import draw_background
 from .slingshot import Slingshot
 from .level_loader import load_level
 
-
 class Game:
     def __init__(self):
         pygame.init()
@@ -26,10 +25,9 @@ class Game:
         self.birds = []
         self.rocks = []
 
-        load_level(self.level, self)
+        load_level(1, self)
 
     def draw(self):
-
         draw_background(self.win)
 
         wait = self.slingshot.update()
@@ -42,39 +40,48 @@ class Game:
 
             load_level(self.level, self)
 
-        for flap in self.birds:
-            flap.move()
-            flap.draw(self.win)
+        if self.birds:
+            for flap in self.birds:
+                flap.move()
+                flap.draw(self.win)
 
-        for rock in self.rocks:
-            rock.draw(self.win)
+        if self.rocks:
+            for rock in self.rocks:
+                rock.draw(self.win)
 
     def collisions(self):
         win = True
-        for flap in self.birds:
-            for rock in self.rocks:
-                if flap.rect.colliderect(rock.rect):
-                    flap.dead = True
-            win = not flap.dead
+        if self.birds:
+            for flap in self.birds:
+                if self.rocks:
+                    for rock in self.rocks:
+                        if flap.rect.colliderect(rock.rect):
+                            flap.dead = True
+                if win and not flap.dead:
+                    win = False
         return win
 
     def run(self):
         self.won = False
 
-        while self.running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+        try:
+            while self.running:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+
+                self.draw()
+
+                if self.collisions():
+                    self.won = True
+                    self.level += 1
                     self.running = False
+                    load_level(1, self)
 
-            self.draw()
-
-            if self.collisions():
-                self.won = True
-                self.level += 1
-                self.running = False
-                load_level(self.level, self)
-
-            self.clock.tick(60)
-            pygame.display.flip()
+                self.clock.tick(60)
+                pygame.display.flip()
+        except Exception as e:
+            print("An exception occurred:", e)
+            pygame.quit()
 
         traceback.print_exc()

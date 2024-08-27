@@ -1,11 +1,13 @@
 import json
 from .bird import Bird
 
+
 def load_level(level, game):
     game.birds = []
     game.rocks = []
     game.slingshot.shot = False
     load_map(level, game)
+
 
 def load_map(level, game):
     if level > 1:
@@ -14,7 +16,6 @@ def load_map(level, game):
     with open(path, "r") as f:
         data = json.load(f)
 
-    # Adjusted to handle the new JSON structure
     for key, obj in data.items():
         obj_type = obj.get("type")
         x = obj.get("x")

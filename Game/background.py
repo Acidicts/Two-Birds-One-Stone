@@ -13,4 +13,4 @@ def draw_background(win):
     pygame.draw.circle(win, (193, 154, 107), (92, 100), 7.5)
     pygame.draw.circle(win, (193, 154, 107), (707, 100), 7.5)
 
-    pygame.draw.rect(win, pygame.Color("darkgreen"), (0, 550, 800, 600))
+    pygame.draw.rect(win, "darkgreen", (0, 550, 800, 600))
